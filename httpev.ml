@@ -932,7 +932,9 @@ let send_reply c cout reply =
     (* TODO do not apply encoding to application/gzip *)
     (* TODO gzip + chunked? *)
     match body, code, c.req with
-    | `Body s, `Ok, Ready { encoding=Gzip; _ } when String.length s > 128 -> ("Content-Encoding", "gzip")::hdrs, `Body (Gzip_io.string s)
+    | `Body s, `Ok, Ready { encoding=Gzip; path; _ } when String.length s > 128 -> 
+      log#info "Gzip encoding request with path = %s" path;
+      ("Content-Encoding", "gzip")::hdrs, `Body (Gzip_io.string s)
     | _ -> hdrs, body
   in
   let hdrs = match body with
